@@ -1,0 +1,37 @@
+#MESA\_Reader.rb: The easy way to access your MESA data
+
+## What Is MESA\_Reader?
+This file gives you access to three classes: MESAData, MESAProfileIndex, and MESALogDir. The primary use is intended for plotting in [Tioga](http://www.kitp.ucsb.edu/members/PM/paxton/tioga.html), but as the tools become more sophisticated, analysis can be done on the fly with irb or standalone scripts.
+
+## Installation
+To install MESA\_Reader, you must already have Tioga installed, since it makes extensive use of DVectors for bulk data storage and easy access for Tioga plots. If you have Tioga installed, simply copy this file (`MESA_Reader.rb`) into the directory where you plan to use the class in other Ruby scripts. For a more permanent solution, put it in your ruby path. For me (on a mac), placing it in `~/usr/lib/ruby/` did the trick. To see where you should install the file for global use enter the following line into your terminal
+
+	ruby -e 'puts $:'
+	
+This should give you a list of directories that would work for installation. To update to a newer version of these tools, just move the new file to the same place.
+
+Placing the file in your work directory may be sufficient if you just plan to use this for plotting purposes since it will copy over with the rest of the directory whenever you make a new work directory.
+
+## Making the Classes Available
+In your program (or irb), just start with
+
+	require 'MESA_Reader'
+	
+If the file is in the same directory as your current working one, it will be read from there. Otherwise, ruby will search through its available paths for a file called `MESA_Reader.rb` and load the first one it finds.
+
+## Creating Instances
+To create a simple `MESAData` instance, use the class `::initialize` method:
+
+	s = MESAData.new(FILEPATH)
+	
+where `FILEPATH` is a string that is the path (relative or fully-qualified) to the file you wish to read in. For instance, if you are in the work directory and you want to read in the history file, you would use `'LOGS/history.data'` in place of `FILEPATH`. You can load history or profile files since the basic `MESAData` object doesn't know the difference (though when loading history files, it does know to throw out backups, retries, and restarts, ensuring that the model numbers are monotonically increasing).
+
+To create a `MESAProfileIndex` instance, we'll use that class' `::initialize` method as well.
+
+	m = MESAProfileIndex.new(FILEPATH)
+
+where now `FILEPATH` is a string containing the path to your profiles index file, like `'LOGS/profiles.index'`.
+
+Finally, to make a `MESALogDir` instance, we use that class' `::initialize` method again. Unlike the first two examples, though, this class can take many more initialization parameters:
+
+	l = MESALogDir.new('log_path' => '~/mesa/star/work/LOGS', 'history_file' => 'history.data')
