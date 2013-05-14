@@ -177,3 +177,8 @@ Nearly identical to `#where` in the `MESAData` class, but ensures that the retur
 	models_to_plot = l.select_models('log_center_T') { |log_tc| log_tc > 8 }
 
 will return a Dvector of model numbers that have profiles available for reading in *and* have central temperatures exceeding 1e8. 
+
+## Some Additional Thoughts
+The uses for these classes are pretty generic. As stated earlier, they were developed primarily to ease plotting MESA data in Tioga, but they are also quite useful for manipulating the data in their own rite for numerical purposes. The only reason you might not want to do that is that Ruby isn't the fastest language available, but then again, if you are dealing with such large MESA data sets that the computational timescales are getting too long for your comfort, you are in a pretty remarkable situation.
+
+If you have any problems with or suggestions for further development of these classes, please contact me or better yet, make some commits and push the changes for deployment!
