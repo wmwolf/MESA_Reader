@@ -32,6 +32,148 @@ To create a `MESAProfileIndex` instance, we'll use that class' `::initialize` me
 
 where now `FILEPATH` is a string containing the path to your profiles index file, like `'LOGS/profiles.index'`.
 
-Finally, to make a `MESALogDir` instance, we use that class' `::initialize` method again. Unlike the first two examples, though, this class can take many more initialization parameters:
+Finally, to make a `MESALogDir` instance, we use that class' `::initialize` method again. Unlike the first two examples, though, this class can take many more initialization parameters. To use just two of them, here's an example:
 
 	l = MESALogDir.new('log_path' => '~/mesa/star/work/LOGS', 'history_file' => 'history.data')
+	
+You can also set `'profile_prefix'`, `'profile_suffix'`, and `'index_file'`, which denote the part of the name of profile before the number, the suffix of a profile file, and the full name of the index file. The defaults are
+
+	'log_path'       => 'LOGS'
+	'profile_prefix' => 'profile'
+	'profile_suffix' => 'data'
+	'history_file'   => 'history.data'
+	'index_file'     => 'profiles.index
+	
+Normally these shouldn't need to be altered, and so long as you don't have custom-named log directories, `l = MESALogDir.new`, with no options, should suffice.
+
+## MESAData Methods
+There are 10 publicly accessible instance methods for `MESAData` objects. Their usage is detailed below. For convenience, we'll assume that `s` is an instance of the `MESAData` class. That is, assume we have already done
+
+	s = MESAData.new('LOGS/history.data')
+
+### `#bulk_data`
+Returns an array of Dvectors containing the columns from the source file. This isn't very useful and is really only a diagnostic tool.
+
+### `#bulk_names`
+Returns an array of strings that are the names of each of the data columns. These are the strings at the top of each data column from the source file. Together with `#bulk_data` forms a hash that is accessed using the `#data` command to convert data column names into Dvectors.
+
+### `#data(key)`
+Accepts a string and returns the corresponding Dvector from `#bulk_data`. This is the main usage of the class.
+
+	s.data('model_number') => [1.0, 2.0, 3.0, 4.0, ...]
+	
+Returns `nil` if no such key exists in `s.bulk_names`.
+
+### `#data?(key)`
+Accepts a string and returns `true` if the entry is found in `s.bulk_names` and `false` otherwise. 
+
+### `#filename`
+Returns a string containing the name of the file that was read into the instance.
+
+### `#header(key)`
+Accepts a string and returns the corresponding value from `#header_data`. The `key` value must be in `s.header_names` or else it will return `nil`. Works in much the same way as `#data` but with the header data rather than the bulk data.
+
+### `#header?(key)`
+Accepts a string and returns `true` if the string is in `s.header_names`.
+
+### `#header_data`
+Returns an array of all the data in the header row of the source file.
+
+### `#header_names`
+Returns an array of strings containing all the names of the header data entries.
+
+### `#where(key)`
+Accepts a string as an argument that needs to be a member of `s.bulk_names`. Then yields each member of `s.data(key)` into a block and performs a user-specified test on that member. Returns an array of integers containing the indices of the set members that passed the test. For example
+
+	s.where('star_age') { |age| age > 1e6 }
+	
+returns an array containing the indices of `s.data('star_age')` whose corresponding elements are greater than a million. A common usage would then be to feed these indices back in to get a subset of an array from `s.data('star_age')`. For instance, one could get all the values of the luminosity for times later than a million years via
+
+	s.data('luminosity').values_at(*s.where('star_age) { |age| age > 1e6 })
+	
+## MESAProfileIndex Methods
+
+There are five publicly accessible methods for the `MESAProfileIndex` class, though likely the only useful methods are `#have_profile_with_model_number?` and `#profile_with_model_number`, which allow you to obtain a model number from a model number. In practice, this class isn't very useful on its own, but is used extensively in the `MESALogDir` class.
+	
+### `#have_profile_with_model_number?(model_number)`
+Accepts an integer, a model number, and returns `true` if there is a profile available with that model number. Otherwise returns `false`.
+
+### `#have_profile_with_profile_number?(profile_number)`
+Accepts an integer, a profile number, and returns `true` if there is a profile with that profile number. Otherwise returns `false`.
+
+### `#model_numbers`
+Returns a Dvector containing all the model numbers that have profiles available.
+
+### `#profile_numbers`
+Returns a Dvector containing all the profile numbers available.
+
+### `#profile_with_model_number(model_number)`
+Accepts an integer model number and returns the profile number that corresponds to it. Returns `nil` if there is no such profile.
+
+## `MESALogDir Methods`
+We'll suppose we've already made an instance for the purpose of examples via
+
+	l = MESALogDir.new
+	
+### `#contents`
+Returns an array of strings containing names of all the files in the directory returned by `l.log_path`.
+
+### `#history_data`
+Returns a `MESAData` instance made from `l.history_file` in `l.log_path`
+
+### `#history_file`
+Returns the name of the history data file in `l.log_path`.
+
+### `#history_file=`
+Resets the name of the history file.
+
+### `#index_file`
+Returns the name of the profile index file in `l.log_path`.
+
+### `#index_file=`
+Resets the name of the profile index file.
+
+### `#log_path`
+Returns a string containing the given path to the logs directory.
+
+### `#log_path=`
+Resets the path to the logs directory.
+
+### `#model_numbers`
+Returns a Dvector containing all the model numbers who have corresponding profiles available.
+
+### `#profiles`
+Returns a `MESAProfileIndex` instance built from `l.index_file`
+
+### `#profile_data(params)`
+Accepts two possible integer arguments, `'model_number'` or `'profile_number'` which specify a profile to be loaded. If neither are given, the profile with the largest model number (i.e., the last saved profile) is selected. Returns a `MESAData` object built from this profile. If the model number provided has no profile (i.e. `l.profiles.profile_with_model_number(params['model_number']) => nil`), then the default model number is selected. If a profile number is used, it will attempt to use it no matter what, triggering an error if the given profile number is invalid. For example
+
+	p = l.profile_data('model_number' => 300)
+	
+would set `p` to be a `MESAData` object built from the profile data associated with model number 300. If no such model number existed, though, it would pull data from the profile with the largest model number. If we instead used
+
+	p = l.profile_data('model_number' => 300, 'profile_number' => 15)
+
+then `p` would be set to a `MESAData` object with profile number 15. The `'model_number'` entry is entirely ignored. If there was no profile with profile number 15, an exception will be raised. Essentially there is never a time when it is helpful to specify both a model number and a profile number, and again, if neither are specified, the profile with the largest model number is used.
+
+### `#profile_numbers`
+Returns a Dvector containing all available profile numbers.
+
+### `#profile_prefix`
+Returns the string containing the profile prefix as defined in the `MESAProfileIndex` class.
+
+### `#profile_prefix=`
+Resets the profile prefix as defined in the `MESAProfileIndex` class.
+
+### `#profile_suffix`
+Returns the string containing the profile suffix as defined in the `MESAProfileIndex` class.
+
+### `#profile_suffix=`
+Resets the profile suffix as defined in the `MESAProfileIndex` class.
+
+### `#select_models(key)`
+Nearly identical to `#where` in the `MESAData` class, but ensures that the returned model numbers have corresponding profile files. Accepts a string that must be in `l.history_data.bulk_names` and yields successive values of `l.history_data.data(key)` to a user-specified block that should return a boolean. Only those model numbers that have available profiles are tested, so the returned Dvector of model numbers (not indices, like in `#where`) have available profiles *and* pass the test provided by the user. As an example
+
+	models_to_plot = l.select_models('log_center_T') { |log_tc| log_tc > 8 }
+
+will return a Dvector of model numbers that have profiles available for reading in *and* have central temperatures exceeding 1e8. 

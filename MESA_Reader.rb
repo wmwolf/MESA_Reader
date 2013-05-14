@@ -190,7 +190,7 @@ end
 # l.contents        # returns array of strings containing names of all files in log_path
 # l.profiles        # returns a MESAProfileIndex object built from index_file
 # l.profile_numbers # same as l.profiles.profile_numbers
-# l.model_number    # same as l.profiles.model_numbers
+# l.model_numbers   # same as l.profiles.model_numbers
 # l.history_data    # returns MESAData instance from history_file
 #                   # same as doing MESAData.new(log_path + '/' + history_file)
 # l.select_models(key)   # Accepts a history file key (like log_L or model_number)
