@@ -1,10 +1,11 @@
 #MESA\_Reader.rb: The easy way to access your MESA data
+___
 
 ## What Is MESA\_Reader?
 This file gives you access to three classes: MESAData, MESAProfileIndex, and MESALogDir. The primary use is intended for plotting in [Tioga](http://www.kitp.ucsb.edu/members/PM/paxton/tioga.html), but as the tools become more sophisticated, analysis can be done on the fly with irb or standalone scripts.
 
 ## Installation
-To install MESA\_Reader, you must already have Tioga installed, since it makes extensive use of DVectors for bulk data storage and easy access for Tioga plots. If you have Tioga installed, simply copy this file (`MESA_Reader.rb`) into the directory where you plan to use the class in other Ruby scripts. For a more permanent solution, put it in your ruby path. For me (on a mac), placing it in `~/usr/lib/ruby/` did the trick. To see where you should install the file for global use enter the following line into your terminal
+To install MESA\_Reader, you must already have Tioga installed, since it makes extensive use of DVectors for bulk data storage and easy access for Tioga plots. If you have Tioga installed, simply copy this file (`MESA_Reader.rb`) into the directory where you plan to use the class in other Ruby scripts. For a more permanent solution, put it in your ruby path. For me (on a mac), placing it in `/usr/lib/ruby/` did the trick. To see where you should install the file for global use enter the following line into your terminal
 
 	ruby -e 'puts $:'
 	
@@ -179,6 +180,10 @@ Nearly identical to `#where` in the `MESAData` class, but ensures that the retur
 will return a Dvector of model numbers that have profiles available for reading in *and* have central temperatures exceeding 1e8. 
 
 ## Some Additional Thoughts
-The uses for these classes are pretty generic. As stated earlier, they were developed primarily to ease plotting MESA data in Tioga, but they are also quite useful for manipulating the data in their own rite for numerical purposes. The only reason you might not want to do that is that Ruby isn't the fastest language available, but then again, if you are dealing with such large MESA data sets that the computational timescales are getting too long for your comfort, you are in a pretty remarkable situation.
+The uses for these classes are pretty generic. As stated earlier, they were developed primarily to ease plotting MESA data in Tioga, but they are also quite useful for manipulating the data in their own rite for numerical purposes. The only reason you might not want to do that is that Ruby isn't the fastest language available, but then again, if you are dealing with such large MESA data sets that the computational timescales are getting too long for your comfort, you are in a pretty remarkable situation. As a practical note, if you use this in irb and you make an instance of `MESAData`, I'd recommend folllowing that up with a semi-colon and `nil` unless you want to see a ton of numbers fly up your screen. For instance, do this
+
+	l = MESALogDir.new; nil
+	
+The `nil` keeps irb from outputting all the data held in `l`.
 
 If you have any problems with or suggestions for further development of these classes, please contact me or better yet, make some commits and push the changes for deployment!
