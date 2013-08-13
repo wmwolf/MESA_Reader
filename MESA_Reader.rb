@@ -255,7 +255,7 @@ class MESALogDir
     # with the given model number, if there is one.
     params = {'model_number' => model_numbers.max, 'profile_number' => nil}.merge(params) 
     model_number = params['model_number'].to_i
-    profile_number = params['profile_numbe'].to_i if params['profile_number']
+    profile_number = params['profile_number'].to_i if params['profile_number']
     profile_number = @profiles.profile_with_model_number(model_number) unless (profile_number or not(model_numbers.include?(model_number)))
     if profile_number
       profile_file_name = "#{@profile_prefix}#{profile_number}.#{profile_suffix}"
