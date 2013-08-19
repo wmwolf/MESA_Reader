@@ -242,7 +242,7 @@ class MESALogDir
     @profile_suffix = params['profile_suffix']
     @history_file = params['history_file']
     @index_file = params['index_file']
-    raise "Invalid log directory: #{log_path}." unless Dir.exists?(log_path)
+    # raise "Invalid log directory: #{log_path}." unless Dir.exist?(log_path)
     @contents = Dir.entries(@log_path)
     raise "No profile index file, #{@index_file}, in #{@log_path}." unless
       @contents.include?(@index_file)
