@@ -45,7 +45,7 @@ class MESAData
     @header_names = read_one_line(@file_name, header_names_row).chomp.split
     @header_data = read_one_line(@file_name, header_data_row).chomp.split
     @header_hash = {}
-    for i in 0...@header_names.size
+    @header_names.each_index do |i|
       if @header_data[i].include?(".")
         new_entry = @header_data[i].to_f
       else
@@ -90,8 +90,8 @@ class MESAData
     raise "#{key} not a recognized data category." unless data?(key)
     raise "Must provide a block for WHERE to test #{key}." unless block_given?
     selected_indices = Array.new
-    for i in 0...data(key).length
-      selected_indices << i if yield(data(key)[i])
+    data(key).each_with_index do |datum, i|
+      selected_indices << i if yield(datum)
     end
     return selected_indices
   end
