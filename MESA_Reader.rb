@@ -1,6 +1,6 @@
 # NAME: MESA_Reader
 # AUTHOR: William Wolf
-# LAST UPDATED: April 30, 2012
+# LAST UPDATED: August 21, 2013
 # PURPOSE: Provides access to the MESAData class, which, through the methods
 #          header and data, can return a value (header) or DVector (data) the
 #          corresponds to the key provided to it. New in this version: access
@@ -67,11 +67,19 @@ class MESAData
   end
   
   def header(key)
-    @header_hash[key]
+    if header?(key)
+      @header_hash[key]
+    else
+      puts "WARNING: Couldn't find header #{key} in #{file_name}."
+    end
   end
   
   def data(key)
-    @data_hash[key]
+    if data?(key)
+      @data_hash[key]
+    else
+      puts "WARNING: Couldn't find column #{key} in #{file_name}."
+    end
   end
   
   def data?(key)
@@ -83,7 +91,11 @@ class MESAData
   end
   
   def data_at_model_number(key, n)
-    @data_hash[key][index_of_model_number(n)]
+    if data?(key)
+      @data_hash[key][index_of_model_number(n)]
+    else
+      puts "WARNING: Couldn't find column #{key} in #{file_name}."
+    end
   end
   
   def where(key)
@@ -107,23 +119,25 @@ class MESAData
     end
   end
   def remove_backups(dbg)
-     # make a list of the ones to be removed
-     lst = []
-     n = data('model_number').length
-     (n-1).times do |k|
-       lst << k if data('model_number')[k] >= data('model_number')[k+1..-1].min
-     end
-     return if lst.length == 0
-     puts "remove #{lst.length} models because of backups" if dbg
-     lst = lst.sort
-     @bulk_data.each { |vec| vec.prune!(lst) }
-     nil
-   end
-   def index_of_model_number(n)
-     raise "No 'model_number' data heading found in #{file_name}.
+    # make a list of the ones to be removed
+    lst = []
+    n = data('model_number').length
+    (n-1).times do |k|
+      lst << k if data('model_number')[k] >= data('model_number')[k+1..-1].min
+    end
+    return if lst.length == 0
+    puts "remove #{lst.length} models because of backups" if dbg
+    lst = lst.sort
+    @bulk_data.each { |vec| vec.prune!(lst) }
+    nil
+  end
+  def index_of_model_number(n)
+    raise "No 'model_number' data heading found in #{file_name}.
        Cannot match to model number #{n}." unless data?('model_number')
-     data('model_number').index(n.to_f)
-   end
+    raise "No such model number: #{n.to_f} in column 'model_number' of file
+      #{file_name}." unless data('model_number').include?(n.to_f)
+    data('model_number').index(n.to_f)
+  end
 end 
 
 
@@ -203,12 +217,16 @@ end
 # l.history_file   # name of history file (default is 'history.data')
 # l.index_file     # name of profile index file (default is 'profiles.index')
 #
-# l.contents        # returns array of strings containing names of all files in log_path
+# l.contents        # returns array of strings containing names of all files in
+#                     log_path
 # l.profiles        # returns a MESAProfileIndex object built from index_file
-# l.profile_numbers # same as l.profiles.profile_numbers
-# l.model_numbers   # same as l.profiles.model_numbers
+#
+# NOTE: ALL MESAProfileIndex METHODS ARE AVAILABLE TO MESALogDir OBJECTS AS WELL
+#
 # l.history_data    # returns MESAData instance from history_file
 #                   # same as doing MESAData.new(log_path + '/' + history_file)
+# l.history         # alias of l.history_data
+#
 # l.select_models(key) { |val| test}  # => Dvector of model numbers whose
 #   history values of the given key category pass the test in the block. For
 #   example,
@@ -230,9 +248,8 @@ end
 
 class MESALogDir
   include Tioga
-  attr_accessor :log_path, :profile_prefix, :profile_suffix, :history_file, 
-    :index_file
-  attr_reader :contents, :profiles
+  attr_reader :contents, :history_file, :profiles, :profile_prefix, :log_path, 
+    :index_file, :profile_suffix
   def initialize(params = {})
     params = {'log_path' => 'LOGS', 'profile_prefix' => 'profile',
       'profile_suffix' => 'data', 'history_file' => 'history.data',
@@ -269,7 +286,7 @@ class MESALogDir
   end
   
   def profile_with_model_number(model_number)
-    profiles.profile_with_model_number(model_number)
+    profiles.profile_with_model_number(model_number.to_i)
   end
   
   def history_data
