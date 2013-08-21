@@ -253,16 +253,30 @@ class MESALogDir
   end
   
   def profile_numbers
-    @profiles.profile_numbers
+    profiles.profile_numbers
   end
   
   def model_numbers
-    @profiles.model_numbers
+    profiles.model_numbers
+  end
+  
+  def have_profile_with_model_number?(model_number)
+    model_numbers.include?(model_number)
+  end
+  
+  def have_profile_with_profile_number?(profile_number)
+    profile_numbers.include?(profile_number)
+  end
+  
+  def profile_with_model_number(model_number)
+    profiles.profile_with_model_number(model_number)
   end
   
   def history_data
     @h
   end
+  
+  alias_method :history, :history_data
   
   def select_models(key)
     model_numbers.select { |num| yield(@h.data_at_model_number(key, num)) }
