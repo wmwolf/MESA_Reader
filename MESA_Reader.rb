@@ -27,10 +27,9 @@
    #   sub-vectors persuant to a test on another vector, like all luminosities
    #   past a certain age.
 
-require 'Tioga/FigureMaker' #gives access to DVectors
+require 'Dobjects/Dvector' #gives access to DVectors
 
 class MESAData
-  include Dobjects
   attr_reader :file_name, :header_names, :header_data, :bulk_names, :bulk_data
   def initialize(file_name, scrub = true, dbg = false)
     # In this context, rows start at 1, not 0. These can and should be changed
@@ -164,7 +163,6 @@ end
 #
 
 class MESAProfileIndex
-  include Tioga
   attr_reader :model_numbers, :profile_numbers
   def initialize(filename)
     @model_numbers = Dvector.new
@@ -247,7 +245,6 @@ end
 #     will fail (no falling back to the default).
 
 class MESALogDir
-  include Tioga
   attr_reader :contents, :history_file, :profiles, :profile_prefix, :log_path,
     :index_file, :profile_suffix
   def initialize(params = {})
