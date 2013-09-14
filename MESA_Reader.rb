@@ -7,9 +7,9 @@
 #          to MESAProfileIndex and MESALogDir classes, described where they
 #          appear.
 
-# EXAMPLES: 
+# EXAMPLES:
    # read in data from filename (either history or profile)
-   # s = MESA_Data.new(filename) 
+   # s = MESA_Data.new(filename)
    # s.header('version_number') # => version number of profile or model
    # s.data('log_Teff') # => Dvector containign log_Teff values from file
    #
@@ -27,20 +27,19 @@
    #   sub-vectors persuant to a test on another vector, like all luminosities
    #   past a certain age.
 
-require 'Tioga/FigureMaker' #gives access to DVectors
+require 'Dobjects/Dvector' #gives access to DVectors
 
 class MESAData
-  include Dobjects
   attr_reader :file_name, :header_names, :header_data, :bulk_names, :bulk_data
   def initialize(file_name, scrub = true, dbg = false)
     # In this context, rows start at 1, not 0. These can and should be changed
     # if MESA conventions change.
-    
+
     header_names_row = 2
     header_data_row = header_names_row + 1
     bulk_names_row = 6
     bulk_data_start_row = bulk_names_row + 1
-    
+
     @file_name = file_name
     @header_names = read_one_line(@file_name, header_names_row).chomp.split
     @header_data = read_one_line(@file_name, header_data_row).chomp.split
@@ -65,7 +64,7 @@ class MESAData
     end
     remove_backups(dbg) if data?('model_number') if scrub
   end
-  
+
   def header(key)
     if header?(key)
       @header_hash[key]
@@ -73,7 +72,7 @@ class MESAData
       puts "WARNING: Couldn't find header #{key} in #{file_name}."
     end
   end
-  
+
   def data(key)
     if data?(key)
       @data_hash[key]
@@ -81,15 +80,15 @@ class MESAData
       puts "WARNING: Couldn't find column #{key} in #{file_name}."
     end
   end
-  
+
   def data?(key)
     @bulk_names.include?(key)
   end
-  
+
   def header?(key)
     @header_names.include?(key)
   end
-  
+
   def data_at_model_number(key, n)
     if data?(key)
       @data_hash[key][index_of_model_number(n)]
@@ -97,7 +96,7 @@ class MESAData
       puts "WARNING: Couldn't find column #{key} in #{file_name}."
     end
   end
-  
+
   def where(key)
     raise "#{key} not a recognized data category." unless data?(key)
     raise "Must provide a block for WHERE to test #{key}." unless block_given?
@@ -107,7 +106,7 @@ class MESAData
     end
     return selected_indices
   end
-  
+
   private
   def read_one_line(file_name, line_number)
     File.open(file_name) do |file|
@@ -138,22 +137,22 @@ class MESAData
       #{file_name}." unless data('model_number').include?(n.to_f)
     data('model_number').index(n.to_f)
   end
-end 
+end
 
 
 # MESAProfileIndex class provides easy access to the data in a mesa profile
 # index file.  It is meant primarily as a helper class to the MESALogDir class
 # but can stand on its own.
-# 
+#
 # EXAMPLES:
 #
-# intialization: 
-# index = MESAProfileIndex.new('~/mesa/star/work/LOGS/profiles.index') 
+# intialization:
+# index = MESAProfileIndex.new('~/mesa/star/work/LOGS/profiles.index')
 # index.model_numbers # => Sorted Dvector of model numbers that have available
 #   profiles
 #
 # index.profile_numbers # => Dvector of profile numbers ordered by model number
-# index.have_profile_with_model_number?(num) # =>  true if there is a profile 
+# index.have_profile_with_model_number?(num) # =>  true if there is a profile
 #   corresponding to model number number. false otherwise
 #
 # index.have_profile_with_profile_number?(num) # =>  true if there is a profile
@@ -164,7 +163,6 @@ end
 #
 
 class MESAProfileIndex
-  include Tioga
   attr_reader :model_numbers, :profile_numbers
   def initialize(filename)
     @model_numbers = Dvector.new
@@ -200,7 +198,7 @@ end
 #
 # Examples:
 #
-# l = MESALogDir.new(:log_path       => '~/mesa/star/work/LOGS', 
+# l = MESALogDir.new(:log_path       => '~/mesa/star/work/LOGS',
 #                    :profile_prefix => 'profile',
 #                    :profile_suffix => 'data',
 #                    :history_file   => 'history.data',
@@ -247,8 +245,7 @@ end
 #     will fail (no falling back to the default).
 
 class MESALogDir
-  include Tioga
-  attr_reader :contents, :history_file, :profiles, :profile_prefix, :log_path, 
+  attr_reader :contents, :history_file, :profiles, :profile_prefix, :log_path,
     :index_file, :profile_suffix
   def initialize(params = {})
     params = {'log_path' => 'LOGS', 'profile_prefix' => 'profile',
@@ -268,43 +265,43 @@ class MESALogDir
     @profiles = MESAProfileIndex.new("#{@log_path}/#{@index_file}")
     @h = MESAData.new("#{log_path}/#{history_file}")
   end
-  
+
   def profile_numbers
     profiles.profile_numbers
   end
-  
+
   def model_numbers
     profiles.model_numbers
   end
-  
+
   def have_profile_with_model_number?(model_number)
     model_numbers.include?(model_number)
   end
-  
+
   def have_profile_with_profile_number?(profile_number)
     profile_numbers.include?(profile_number)
   end
-  
+
   def profile_with_model_number(model_number)
     profiles.profile_with_model_number(model_number.to_i)
   end
-  
+
   def history_data
     @h
   end
-  
+
   alias_method :history, :history_data
-  
+
   def select_models(key)
     model_numbers.select { |num| yield(@h.data_at_model_number(key, num)) }
   end
-  
+
   def profile_data(params = {})
     # default behavior is to load profile of last model available, next
     # preferred number is a specified profile number, and final preference is
     # the profile that corresponds with the given model number, if there is one.
     params = {'model_number' => model_numbers.max,
-         'profile_number' => nil}.merge(params) 
+         'profile_number' => nil}.merge(params)
     model_number = params['model_number'].to_i
     profile_number = params['profile_number'].to_i if params['profile_number']
     unless (profile_number or not(model_numbers.include?(model_number)))
