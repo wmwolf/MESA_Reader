@@ -20,12 +20,17 @@
    #  category, otherwise false
    #
    # s.data?('log_Teff') # => true if 'log_Teff' is a data category in file,
-   #   otherwise false
+   #  otherwise false
    #
-   # s.where('log_Teff') {test} # => array of indices for values of
-   #   s.data('log_Teff') for which test is true. Useful for selecting
-   #   sub-vectors persuant to a test on another vector, like all luminosities
-   #   past a certain age.
+   # s.where('log_Teff', 'log_L', ...) { |t, l, ...| test(t, l, ...)} # =>
+   #   array of indices for  values of s.data('log_Teff'), s.data('log_L'),
+   #   etc. for which the test function returns true.
+   #  Useful for selecting sub-vectors persuant to a test on another vector,
+   #  like all luminosities past a certain age. You may specify an arbitrary
+   #  number of key (data categories) so your test can be arbitrarily
+   #  complicated. For instance, the example test could select points from a
+   #  history file that correspond to a time when the stellar model was in a
+   #  particular region of the HR diagram.
 
 require 'Dobjects/Dvector' #gives access to DVectors
 
@@ -97,14 +102,21 @@ class MESAData
     end
   end
 
-  def where(key)
-    raise "#{key} not a recognized data category." unless data?(key)
-    raise "Must provide a block for WHERE to test #{key}." unless block_given?
-    selected_indices = Array.new
-    data(key).each_with_index do |datum, i|
-      selected_indices << i if yield(datum)
+  def where(*keys)
+    keys.each do |key|
+      raise "#{key} not a recognized data category." unless data?(key)
     end
-    return selected_indices
+    unless block_given?
+      raise "Must provide a block for WHERE to test values of provided keys." 
+    end
+    selected_indices = Array.new
+    data(keys[0]).each_index do |i|
+      params = keys.map { |key| data(key)[i] }
+      selected_indices << i if yield(*params)
+    end
+    puts "WARNING: No model numbers/grid points met the selection critera " + 
+      "given. Returning and empty array." if selected_indices.empty?
+    return selected_indices    
   end
 
   private
@@ -225,14 +237,16 @@ end
 #                   # same as doing MESAData.new(log_path + '/' + history_file)
 # l.history         # alias of l.history_data
 #
-# l.select_models(key) { |val| test}  # => Dvector of model numbers whose
-#   history values of the given key category pass the test in the block. For
-#   example,
+#   l.select_models(keys) { |val1, val2, ...| test(val1, val2, ...)} # =>
+#     Dvector of model numbers whose history values of the given key categories
+#     pass the test in the block. For example,
 #
-#   late_time_model_nums = l.select_models('star_age') { |age| age > 1e5 }
+#   late_time_model_nums = l.select_models('star_age', 'log_L') do |age, l|
+#     age > 1e5 and l > 2
+#   end
 #
 #   should return a Dvector of all model numbers where the age is greater than
-#   1e5 AND there is an available profile in log_path
+#   1e5 AND log_L > 2 AND there is an available profile in log_path
 #
 # l.profile_data(params) # =>  MESAData instance for profile specified in params
 #   params = {:profile_number => num1, :model_number => num2}
@@ -292,8 +306,15 @@ class MESALogDir
 
   alias_method :history, :history_data
 
-  def select_models(key)
-    model_numbers.select { |num| yield(@h.data_at_model_number(key, num)) }
+  # def select_models(key)
+  #   model_numbers.select { |num| yield(@h.data_at_model_number(key, num)) }
+  # end
+  
+  def select_models(*keys)
+    model_numbers.select do |num|
+      params = keys.map { |key| @h.data_at_model_number(key, num) }
+      yield(*params)
+    end
   end
 
   def profile_data(params = {})

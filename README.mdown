@@ -168,17 +168,18 @@ Returns an array of all the data in the header row of the source file.
 ### `#header_names`
 Returns an array of strings containing all the names of the header data entries.
 
-### `#where(key)`
-Accepts a string as an argument that needs to be a member of `s.bulk_names`.
-Then yields each member of `s.data(key)` into a block and performs a
-user-specified test on that member. Returns an array of integers containing the
+### `#where(keys)`
+Accepts an arbitrary (at least one) number of strings as arguments, each of
+which must be a member of `s.bulk_names`. Then yields each member of
+`s.data(key1)`, `s.data(key2)`, etc. into a [required] block and performs a
+user-specified test on those data. Returns an array of integers containing the
 indices of the set members that passed the test. For example
 
-	s.where('star_age') { |age| age > 1e6 }
+	s.where('star_age', 'log_L') { |age, lum| age > 1e6 and lum > 2 }
 	
-returns an array containing the indices of `s.data('star_age')` whose
-corresponding elements are greater than a million. A common usage would then be
-to feed these indices back in to get a subset of an array from
+returns an array containing the indices , `i` such that 
+`s.data('star_age')[i] > 1e6` and `s.data('log_L')[i] > 2`. A common usage
+would then be to feed these indices back in to get a subset of an array from
 `s.data('star_age')`. For instance, one could get all the values of the
 luminosity for times later than a million years via
 
@@ -281,19 +282,21 @@ Returns the string containing the profile prefix as defined in the
 Returns the string containing the profile suffix as defined in the
 `MESAProfileIndex` class.
 
-### `#select_models(key)`
+### `#select_models(keys)`
 Nearly identical to `#where` in the `MESAData` class, but ensures that the
-returned model numbers have corresponding profile files. Accepts a string that
-must be in `l.history_data.bulk_names` and yields successive values of
-`l.history_data.data(key)` to a user-specified block that should return a
-boolean. Only those model numbers that have available profiles are tested, so
-the returned Dvector of model numbers (not indices, like in `#where`) have
-available profiles *and* pass the test provided by the user. As an example
+returned model numbers have corresponding profile files. Accepts an arbitrary
+number (at least one) of strings that must be in `l.history_data.bulk_names`
+and yields successive values of `l.history_data.data(key)` for each key to a
+user-specified block that should return a boolean. Only those model numbers
+that have available profiles are tested, so the returned Dvector of model
+numbers (not indices, like in `#where`) have available profiles *and* pass the
+test provided by the user. As an example
 
-	models_to_plot = l.select_models('log_center_T') { |log_tc| log_tc > 8 }
+	models_to_plot = l.select_models('log_center_T', 'log_center_Rho') { |log_tc, log_rhoc| log_tc > 8 and log_rhoc > 3 }
 
 will return a Dvector of model numbers that have profiles available for reading
-in *and* have central temperatures exceeding 1e8.
+in *and* have central temperatures exceeding 1e8 *and* have central densities
+exceeding 1e3.
 
 ## Some Additional Thoughts
 The uses for these classes are pretty generic. As stated earlier, they were
@@ -309,7 +312,9 @@ numbers fly up your screen. For instance, do this
 
 	l = MESALogDir.new; nil
 	
-The `nil` keeps irb from outputting all the data held in `l`.
-If you have any problems with or suggestions for further development of these
-classes, please contact me or better yet, make some commits and push the
-changes for deployment!
+The `nil` keeps irb from outputting all the data held in `l`. Or consider using
+the wonderful irb replacement [Pry](http://pryrepl.org) which can make
+exploring your data outside of plots a much more pleasant experience. If you
+have any problems with or suggestions for further development of these classes,
+please contact me or better yet, make some commits and push the changes for
+deployment!
