@@ -311,6 +311,14 @@ class MESALogDir
   # end
   
   def select_models(*keys)
+    keys.each do |key|
+      raise "#{key} not a recognized data category." unless @h.data?(key)
+    end
+    unless block_given?
+      raise "Must provide a block for SELECT_MODELS to test values of" + 
+      " provided keys."
+    end
+    
     model_numbers.select do |num|
       params = keys.map { |key| @h.data_at_model_number(key, num) }
       yield(*params)

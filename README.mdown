@@ -314,7 +314,8 @@ numbers fly up your screen. For instance, do this
 	
 The `nil` keeps irb from outputting all the data held in `l`. Or consider using
 the wonderful irb replacement [Pry](http://pryrepl.org) which can make
-exploring your data outside of plots a much more pleasant experience. If you
+exploring your data outside of plots a much more pleasant experience (for
+instance a simple semi-colon will suppress outputting the return value). If you
 have any problems with or suggestions for further development of these classes,
 please contact me or better yet, make some commits and push the changes for
 deployment!
