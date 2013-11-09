@@ -30,7 +30,6 @@
 require 'Dobjects/Dvector' #gives access to DVectors
 
 class MESAData
-  include Dobjects
   attr_reader :file_name, :header_names, :header_data, :bulk_names, :bulk_data
   def initialize(file_name, scrub = true, dbg = false)
     # In this context, rows start at 1, not 0. These can and should be changed
@@ -56,9 +55,9 @@ class MESAData
     @bulk_names = read_one_line(@file_name, bulk_names_row).chomp.split
     @bulk_data = Array.new(@bulk_names.size)
     0.upto(@bulk_names.length-1) do |i|
-      @bulk_data[i] = Dvector.new
+      @bulk_data[i] = Dobjects::Dvector.new
     end
-    Dvector.read(file_name,@bulk_data,bulk_data_start_row)
+    Dobjects::Dvector.read(file_name,@bulk_data,bulk_data_start_row)
     @data_hash = {}
     @bulk_names.each do |name|
       @data_hash[name] = @bulk_data[@bulk_names.index(name)]
@@ -164,14 +163,13 @@ end
 #
 
 class MESAProfileIndex
-  include Dobjects
   attr_reader :model_numbers, :profile_numbers
   def initialize(filename)
-    @model_numbers = Dvector.new
-    @priorities = Dvector.new
-    @profile_numbers = Dvector.new
+    @model_numbers = Dobjects::Dvector.new
+    @priorities = Dobjects::Dvector.new
+    @profile_numbers = Dobjects::Dvector.new
     @data_array = [@model_numbers, @priorities, @profile_numbers]
-    Dvector.read(filename, @data_array, 2)
+    Dobjects::Dvector.read(filename, @data_array, 2)
     @model_number_hash = {}
     @model_numbers.each_with_index do |num, i|
       @model_number_hash[num.to_i] = @profile_numbers[i].to_i
@@ -247,7 +245,6 @@ end
 #     will fail (no falling back to the default).
 
 class MESALogDir
-  include Dobjects
   attr_reader :contents, :history_file, :profiles, :profile_prefix, :log_path,
     :index_file, :profile_suffix
   def initialize(params = {})
