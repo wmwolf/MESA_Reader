@@ -149,6 +149,13 @@ class MESAData
       #{file_name}." unless data('model_number').include?(n.to_f)
     data('model_number').index(n.to_f)
   end
+  
+  # Add magic methods
+  def method_missing(name, *args)
+    return super unless @bulk_names.include?(name.to_s)
+    data(name.to_s)
+  end
+  
 end
 
 
