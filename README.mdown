@@ -198,11 +198,21 @@ and
 
 	s.model_number
   
-should do the same thing. This is essentially just syntatic sugar, but it makes
-for more readable code. The `#data` way of doing things is always invoked at
-some point, so it is the "preferred" method of accessing data, but magic methods
-should, for nearly all cases, perform just as well unless you have unfortunately
-named data categories (starting with numbers, or they are tragically named the same as an already existing method, like, `nil?`).
+should return the same thing. This is essentially just syntatic sugar, but it
+makes for more readable code. The `#data` way of doing things is always invoked
+at some point, so it is the "preferred" method of accessing data, but magic
+methods should, for nearly all cases, perform just as well unless you have
+unfortunately named data categories (starting with numbers, or they are
+tragically named the same as an already existing method, like, `nil?`).
+
+If the method name used is not in `s.bulk_names` but is in `s.header_names`,
+then it returns the appropriate header data instead. If the name is in both 
+the header and data names, the data entry wins (this sometimes happens with 
+things like `version_number` and the like). If you use an invalid method (i.e. 
+one that is not explicitly defined in the class or its superclass, the basic 
+Ruby object `Object`, or a method implicitly defined from the data and header
+categories via magic methods) a `NameError` will be thrown, just like it is for
+any other case of a bad method call.
  	
 ## MESAProfileIndex Methods
 
