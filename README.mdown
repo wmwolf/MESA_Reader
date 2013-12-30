@@ -184,6 +184,25 @@ would then be to feed these indices back in to get a subset of an array from
 luminosity for times later than a million years via
 
 	s.data('luminosity').values_at(*s.where('star_age) { |age| age > 1e6 })
+  
+### Magic Methods
+Depending on the type of file read in to the object (specifically what ends up
+in `s.bulk_names`), you can also access the bulk data through some shorthand
+without using the `#data` method. So long as the data name isn't already a 
+defined method on the `MESAData` class, you can simply use its name as a method
+which just returns `data("#{name}")`. That is, if you load in a history file, 
+
+	s.data('model_number')
+  
+and
+
+	s.model_number
+  
+should do the same thing. This is essentially just syntatic sugar, but it makes
+for more readable code. The `#data` way of doing things is always invoked at
+some point, so it is the "preferred" method of accessing data, but magic methods
+should, for nearly all cases, perform just as well unless you have unfortunately
+named data categories (starting with numbers, or they are tragically named the same as an already existing method, like, `nil?`).
  	
 ## MESAProfileIndex Methods
 
