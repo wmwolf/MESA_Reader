@@ -312,10 +312,6 @@ class MESALogDir
   end
 
   alias_method :history, :history_data
-
-  # def select_models(key)
-  #   model_numbers.select { |num| yield(@h.data_at_model_number(key, num)) }
-  # end
   
   def select_models(*keys)
     keys.each do |key|
