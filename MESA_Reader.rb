@@ -152,8 +152,12 @@ class MESAData
   
   # Add magic methods
   def method_missing(name, *args)
-    return super unless @bulk_names.include?(name.to_s)
-    data(name.to_s)
+    if @bulk_names.include?(name.to_s) 
+      return data(name.to_s)
+    elsif @header_names.include?(name.to_s)
+      return header(name.to_s)
+    end
+    return super
   end
   
 end
