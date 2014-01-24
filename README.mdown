@@ -149,7 +149,7 @@ outside the range of `s.data('model_number')`.
 Accepts a string and returns `true` if the entry is found in `s.bulk_names` and
 `false` otherwise.
 
-### `#filename`
+### `#file_name`
 Returns a string containing the name of the file that was read into the
 instance.
 
