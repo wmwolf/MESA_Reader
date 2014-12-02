@@ -36,8 +36,9 @@ require 'Dobjects/Dvector' # gives access to DVectors
 module MesaReader
 
   class MesaData
-    attr_reader :file_name, :header_names, :header_data, :bulk_names, :bulk_data
-    def initialize(file_name, scrub = true, dbg = false)
+    attr_reader :file_name, :header_names, :header_data, :bulk_names, 
+      :bulk_data, :data_hash, :header_hash
+    def initialize(filename, scrub = true, dbg = false)
       # In this context, rows start at 1, not 0. These can and should be changed
       # if MESA conventions change.
 
@@ -46,34 +47,34 @@ module MesaReader
       bulk_names_row = 6
       bulk_data_start_row = bulk_names_row + 1
 
-      @file_name = file_name
-      @header_names = read_one_line(@file_name, header_names_row).chomp.split
-      @header_data = read_one_line(@file_name, header_data_row).chomp.split
+      @file_name = filename
+      @header_names = read_one_line(file_name, header_names_row).chomp.split
+      @header_data = read_one_line(file_name, header_data_row).chomp.split
       @header_hash = {}
-      @header_names.each_index do |i|
-        if @header_data[i].include?(".")
-          new_entry = @header_data[i].to_f
+      header_names.each_index do |i|
+        if header_data[i].include?(".")
+          new_entry = header_data[i].to_f
         else
-          new_entry = @header_data[i].to_i
+          new_entry = header_data[i].to_i
         end
-        @header_hash[@header_names[i]] = new_entry
+        @header_hash[header_names[i]] = new_entry
       end
-      @bulk_names = read_one_line(@file_name, bulk_names_row).chomp.split
-      @bulk_data = Array.new(@bulk_names.size)
-      0.upto(@bulk_names.length-1) do |i|
+      @bulk_names = read_one_line(file_name, bulk_names_row).chomp.split
+      @bulk_data = Array.new(bulk_names.size)
+      0.upto(bulk_names.length-1) do |i|
         @bulk_data[i] = Dobjects::Dvector.new
       end
-      Dobjects::Dvector.read(file_name,@bulk_data,bulk_data_start_row)
+      Dobjects::Dvector.read(file_name, @bulk_data, bulk_data_start_row)
       @data_hash = {}
-      @bulk_names.each do |name|
-        @data_hash[name] = @bulk_data[@bulk_names.index(name)]
+      bulk_names.each do |name|
+        @data_hash[name] = bulk_data[bulk_names.index(name)]
       end
-      remove_backups(dbg) if data?('model_number') if scrub
+      remove_backups(dbg) if (data?('model_number') and scrub)
     end
 
     def header(key)
       if header?(key)
-        @header_hash[key]
+        header_hash[key]
       else
         puts "WARNING: Couldn't find header #{key} in #{file_name}."
       end
@@ -81,23 +82,23 @@ module MesaReader
 
     def data(key)
       if data?(key)
-        @data_hash[key]
+        data_hash[key]
       else
         puts "WARNING: Couldn't find column #{key} in #{file_name}."
       end
     end
 
     def data?(key)
-      @bulk_names.include?(key)
+      bulk_names.include?(key)
     end
 
     def header?(key)
-      @header_names.include?(key)
+      header_names.include?(key)
     end
 
     def data_at_model_number(key, n)
       if data?(key)
-        @data_hash[key][index_of_model_number(n)]
+        data_hash[key][index_of_model_number(n)]
       else
         puts "WARNING: Couldn't find column #{key} in #{file_name}."
       end
@@ -108,15 +109,15 @@ module MesaReader
         raise "#{key} not a recognized data category." unless data?(key)
       end
       unless block_given?
-        raise "Must provide a block for WHERE to test values of provided keys." 
+        raise "Must provide a block for WHERE to test values of provided keys."
       end
       selected_indices = Array.new
       data(keys[0]).each_index do |i|
         params = keys.map { |key| data(key)[i] }
         selected_indices << i if yield(*params)
       end
-      puts "WARNING: No model numbers/grid points met the selection critera " + 
-        "given. Returning and empty array." if selected_indices.empty?
+      puts "WARNING: No model numbers/grid points met the selection critera " +
+        "given. Returning an empty array." if selected_indices.empty?
       return selected_indices    
     end
 
@@ -153,9 +154,9 @@ module MesaReader
     
     # Add magic methods
     def method_missing(name, *args)
-      if @bulk_names.include?(name.to_s) 
+      if bulk_names.include?(name.to_s) 
         return data(name.to_s)
-      elsif @header_names.include?(name.to_s)
+      elsif header_names.include?(name.to_s)
         return header(name.to_s)
       end
       return super
