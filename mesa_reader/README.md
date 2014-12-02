@@ -1,10 +1,12 @@
-#MESA\_Reader.rb: The easy way to access your MESA data
+#MesaReader: The easy way to access your MESA data
 ___
 
-## What Is MESA\_Reader?
-This file gives you access to three classes: MESAData, MESAProfileIndex, and
-MESALogDir. The primary use is intended for plotting in
-[Tioga](http://www.kitp.ucsb.edu/members/PM/paxton/tioga.html), but as the
+## What Is MesaReader?
+
+This file gives you access to a ruby module, MesaReader, containing three
+classes: MesaData, MesaProfileIndex, and MesaLogDir. The primary use is
+intended for plotting in
+[Tioga](http://www.kitp.ucsb.edu/members/PM/paxton/tioga.html), but as the 
 tools become more sophisticated, analysis can be done on the fly with irb or
 standalone scripts.
 
@@ -12,25 +14,39 @@ standalone scripts.
 
 ### Prerequisites ###
 
-To install MESA\_Reader, you must already have Tioga installed, since it makes
-extensive use of DVectors for bulk data storage and easy access for Tioga
-plots. Obivously you need an installation of Ruby. I haven't found any conflicts with Ruby 1.8.7, 1.9.3, or 2.0, and I'm told it now works with 1.8.6. 
+Obivously you need an installation of Ruby. I haven't found any conflicts with Ruby 1.8.7, 1.9.3, or 2.0+, and I'm told it now works with 1.8.6. If you are doing a manual installation, you will also need to have tiogga, a plotting
+package, installed since MesaReader gathers data into Dvectors, which are a
+part of Tioga.
 
-### Local Installation ###
+### Quick Installation ###
 
-Placing the file in your work directory may be sufficient if you just plan to
-use this for plotting purposes since it will copy over with the rest of the
-directory whenever you make a new work directory.
+As of this writing, MesaReader is now packaged as a gem. If you have RubyGems
+working (and you probably do), you should be able to install it via
+
+    gem install mesa_reader
+
+You may need to have superuser privileges, so just prepend `sudo` to the
+previous command if rubygems barks at you about privileges. Tioga is a
+prerequisite since MesaReader loads data into Dvectors, but Tioga installation
+should occur automatically.
+
+### Manual Installation ###
+
+If you can't use a RubyGems installation, you can manually place the 
+`mesa_reader.rb` file in useful location for installation. Copying it to
+your work directory may be sufficient if you just plan to use this for plotting
+purposes since it will copy over with the rest of the directory whenever you
+make a new work directory.
 
 Another possible installation idea that I've been using is to clone the git
-repository somewhere sensible on my machine and then create a pointer file in my
-Ruby path (see below). For instance, I have a file in `/usr/lib/ruby/` called 
-`MESA_Reader.rb` that has one line:
+repository somewhere sensible on my machine and then create a pointer file in 
+my Ruby path (see below). For instance, I have a file in `/usr/lib/ruby/` 
+called `mesa_reader.rb` that has one line:
 
-	require '/Users/wmwolf/Documents/MESA_Reader/MESA_Reader.rb'
+	require '/Users/wmwolf/Documents/MESA_Reader/mesa_reader/lib/mesa_reader.rb'
 
 That way, the source file is easily accessible in my git repo while also being
-readable from Ruby's path. That is, when you tell ruby to require MESA\_Reader,
+readable from Ruby's path. That is, when you tell ruby to require MesaReader,
 it will find the file in its path, which will then load the file from your
 local repo.
 
@@ -40,66 +56,79 @@ it. You'll want to change the path to where you want to install the file, but
 the commands are
 
 	cd ~/Documents
-	git clone https://github.com/wmwolf/MESA_Reader.git MESA_Reader
+	git clone https://github.com/wmwolf/MESA_Reader.git MesaReader
 
-which will install the contents of the repo (currently just the MESA\_Reader.rb 
-file and this README) into a directory called MESA\_Reader in your Documents
+which will install the contents of the repo (currently a RubyGems-style directory for MesaReader and this README) into a directory called MesaReader in your Documents
 directory. Then any time you want to update to the latest release, you can do
 
-	cd ~/Documents/MESA_Reader
+	cd ~/Documents/MesaReader
 	git pull
-	
+
 Or, hopefully, you can make your own additions and push updates for me to add!
 
 ### Global Installation ###
 
-For a more permanent solution, put MESA\_Reader.rb in your ruby path. For me
+For a more permanent solution, put mesa_reader.rb in your ruby path. For me
 (on a mac), placing it in `/usr/lib/ruby/` did the trick. To see where you
 should install the file for global use enter the following line into your
 terminal
 
 	ruby -e 'puts $:'
-	
+
 This should give you a list of directories that would work for installation. To
 update to a newer version of these tools, just move the new file to the same
 place.
 
-## Making the Classes Available
+## Making the Module Available
 In your program (or irb), just start with
 
-	require 'MESA_Reader'
-	
+	require 'mesa_reader'
+
 If the file is in the same directory as your current working one, it will be
 read from there. Otherwise, ruby will search through its available paths for a
-file called `MESA_Reader.rb` and load the first one it finds.
+file called `mesa_reader.rb` and load the first one it finds. Note that in Ruby
+2.0+, the working directory is no longer on the search. You must either use
+`require_relative` or explicitly indicate that you want to search the current
+directory with `require './mesa_reader`. This will also work in earlier versions of ruby, so if you are requiring a local copy, you should get in this
+habit.
+
+If you want direct access to the classes, you will also need to put in the line
+
+    include MesaReader
+
+This takes all of the contents of the module `MesaReader` and drops them into 
+your current namespace. If you don't do this, you'll just have to add 
+`MesaReader::` in front of any class name, like `MesaReader::MesaData` or 
+`MesaReader::MesaLogDir`. For subsequent examples, I'll assume you have
+included the entire module (i.e., no more typing out `MesaReader::`).
 
 ## Creating Instances
-To create a simple `MESAData` instance, use the class `::initialize` method:
+To create a simple `MesaData` instance, use the class `#initialize` method:
 
-	s = MESAData.new(FILEPATH)
-	
+	s = MesaData.new(FILEPATH)
+
 where `FILEPATH` is a string that is the path (relative or fully-qualified) to
 the file you wish to read in. For instance, if you are in the work directory
 and you want to read in the history file, you would use `'LOGS/history.data'`
 in place of `FILEPATH`. You can load history or profile files since the basic
-`MESAData` object doesn't know the difference (though when loading history
+`MesaData` object doesn't know the difference (though when loading history
 files, it does know to throw out backups, retries, and restarts, ensuring that
 the model numbers are monotonically increasing).
 
-To create a `MESAProfileIndex` instance, we'll use that class' `::initialize`
+To create a `MesaProfileIndex` instance, we'll use that class' `#initialize`
 method as well.
 
-	m = MESAProfileIndex.new(FILEPATH)
+	m = MesaProfileIndex.new(FILEPATH)
 
 where now `FILEPATH` is a string containing the path to your profiles index
 file, like `'LOGS/profiles.index'`.
 
-Finally, to make a `MESALogDir` instance, we use that class' `::initialize`
+Finally, to make a `MesaLogDir` instance, we use that class' `#initialize`
 method again. Unlike the first two examples, though, this class can take many
 more initialization parameters. To use just two of them, here's an example:
 
-	l = MESALogDir.new('log_path' => '~/mesa/star/work/LOGS', 'history_file' => 'history.data')
-	
+	l = MesaLogDir.new('log_path' => '~/mesa/star/work/LOGS', 'history_file' => 'history.data')
+
 You can also set `'profile_prefix'`, `'profile_suffix'`, and `'index_file'`,
 which denote the part of the name of profile before the number, the suffix of a
 profile file, and the full name of the index file. The defaults are
@@ -109,15 +138,16 @@ profile file, and the full name of the index file. The defaults are
 	'profile_suffix' => 'data'
 	'history_file'   => 'history.data'
 	'index_file'     => 'profiles.index
-	
-Normally these shouldn't need to be altered, and so long as you don't have custom-named log directories, `l = MESALogDir.new`, with no options, should suffice.
 
-## MESAData Methods
-There are 11 publicly accessible instance methods for `MESAData` objects. Their
-usage is detailed below. For convenience, we'll assume that `s` is an instance
-of the `MESAData` class. That is, assume we have already done
+Normally these shouldn't need to be altered, and so long as you don't have custom-named log directories, `l = MesaLogDir.new`, with no options, should suffice.
 
-	s = MESAData.new('LOGS/history.data')
+## MesaData Methods
+
+There are many publicly accessible instance methods for `MesaData` objects.
+Their usage is detailed below. For convenience, we'll assume that `s` is an
+instance of the `MesaData` class. That is, assume we have already done
+
+	s = MesaData.new('LOGS/history.data')
 
 ### `#bulk_data`
 Returns an array of Dvectors containing the columns from the source file. This
@@ -134,11 +164,10 @@ Accepts a string and returns the corresponding Dvector from `#bulk_data`. This
 is the main usage of the class.
 
 	s.data('model_number') => [1.0, 2.0, 3.0, 4.0, ...]
-	
+
 Returns `nil` and prints a warning if no such key exists in `s.bulk_names`.
 
 ### `#data_at_model_number(key, model_number)`
-
 Accepts a string and a model number (float or integer) and returns the value of
 `s.data(key)` at the index corresponding to the given model number. If no such 
 data category exists, returns `nil` and prints a warning. An exception will be
@@ -176,7 +205,7 @@ user-specified test on those data. Returns an array of integers containing the
 indices of the set members that passed the test. For example
 
 	s.where('star_age', 'log_L') { |age, lum| age > 1e6 and lum > 2 }
-	
+
 returns an array containing the indices , `i` such that 
 `s.data('star_age')[i] > 1e6` and `s.data('log_L')[i] > 2`. A common usage
 would then be to feed these indices back in to get a subset of an array from
@@ -189,7 +218,7 @@ luminosity for times later than a million years via
 Depending on the type of file read in to the object (specifically what ends up
 in `s.bulk_names`), you can also access the bulk data through some shorthand
 without using the `#data` method. So long as the data name isn't already a 
-defined method on the `MESAData` class, you can simply use its name as a method
+defined method on the `MesaData` class, you can simply use its name as a method
 which just returns `data("#{name}")`. That is, if you load in a history file, 
 
 	s.data('model_number')
@@ -214,13 +243,13 @@ Ruby object `Object`, or a method implicitly defined from the data and header
 categories via magic methods) a `NameError` will be thrown, just like it is for
 any other case of a bad method call.
  	
-## MESAProfileIndex Methods
+## MesaProfileIndex Methods
 
-There are five publicly accessible methods for the `MESAProfileIndex` class,
+There are five publicly accessible methods for the `MesaProfileIndex` class,
 though likely the only useful methods are `#have_profile_with_model_number?`
 and `#profile_with_model_number`, which allow you to obtain a model number from
 a model number. In practice, this class isn't very useful on its own, but is
-used extensively in the `MESALogDir` class.
+used extensively in the `MesaLogDir` class.
 	
 ### `#have_profile_with_model_number?(model_number)`
 Accepts an integer, a model number, and returns `true` if there is a profile
@@ -240,24 +269,24 @@ Returns a Dvector containing all the profile numbers available.
 Accepts an integer model number and returns the profile number that corresponds
 to it. Returns `nil` if there is no such profile.
 
-## `MESALogDir Methods`
+## `MesaLogDir Methods`
 We'll suppose we've already made an instance for the purpose of examples via
 
-	l = MESALogDir.new
-	
-In addition to the methods defined below, all the methods of `MESAProfileIndex` 
-are available and are simply called on the internal `MESAProfileIndex` created
-within the `MESALogDir` structure.
+	l = MesaLogDir.new
+
+In addition to the methods defined below, all the methods of `MesaProfileIndex`
+are available and are simply called on the internal `MesaProfileIndex` created
+within the `MesaLogDir` structure.
 	
 ### `#contents`
 Returns an array of strings containing names of all the files in the directory
 returned by `l.log_path`.
 
 ### `#history_data`
-Returns a `MESAData` instance made from `l.history_file` in `l.log_path`. This 
-object is created at initialization and is thus "free". There's no need to catch
-this in a variable to spare the MESAData initialization process each time it is
-called.
+Returns a `MesaData` instance made from `l.history_file` in `l.log_path`. This
+object is created at initialization and is thus "free". There's no need to
+catch this in a variable to spare the MesaData initialization process each time
+it is called.
 
 ### `#history` ###
 Alias for `history`.
@@ -272,27 +301,27 @@ Returns the name of the profile index file in `l.log_path`.
 Returns a string containing the given path to the logs directory.
 
 ### `#profiles`
-Returns a `MESAProfileIndex` instance built from `l.index_file`
+Returns a `MesaProfileIndex` instance built from `l.index_file`
 
 ### `#profile_data(params)`
 Accepts two possible integer arguments, `'model_number'` or `'profile_number'`
 which specify a profile to be loaded. If neither are given, the profile with
 the largest model number (i.e., the last saved profile) is selected. Returns a
-`MESAData` object built from this profile. If the model number provided has no
+`MesaData` object built from this profile. If the model number provided has no
 profile (i.e. `l.profiles.profile_with_model_number(params['model_number']) =>
 nil`), then the default model number is selected. If a profile number is used,
 it will attempt to use it no matter what, triggering an error if the given
 profile number is invalid. For example
 
 	p = l.profile_data('model_number' => 300)
-	
-would set `p` to be a `MESAData` object built from the profile data associated
+
+would set `p` to be a `MesaData` object built from the profile data associated
 with model number 300. If no such model number existed, though, it would pull
 data from the profile with the largest model number. If we instead used
 
 	p = l.profile_data('model_number' => 300, 'profile_number' => 15)
 
-then `p` would be set to a `MESAData` object with profile number 15. The
+then `p` would be set to a `MesaData` object with profile number 15. The
 `'model_number'` entry is entirely ignored. If there was no profile with
 profile number 15, an exception will be raised. Essentially there is never a
 time when it is helpful to specify both a model number and a profile number,
@@ -300,19 +329,19 @@ and again, if neither are specified, the profile with the largest model number
 is used.
 
 Each of these objects are made as this is called. That is, they aren't "sitting
-around" like the history MESAData object. As such, these should be captured in
+around" like the history MesaData object. As such, these should be captured in
 a variable so that they aren't re-constructed each time they are needed.
 
 ### `#profile_prefix`
 Returns the string containing the profile prefix as defined in the
-`MESAProfileIndex` class.
+`MesaProfileIndex` class.
 
 ### `#profile_suffix`
 Returns the string containing the profile suffix as defined in the
-`MESAProfileIndex` class.
+`MesaProfileIndex` class.
 
 ### `#select_models(keys)`
-Nearly identical to `#where` in the `MESAData` class, but ensures that the
+Nearly identical to `#where` in the `MesaData` class, but ensures that the
 returned model numbers have corresponding profile files. Accepts an arbitrary
 number (at least one) of strings that must be in `l.history_data.bulk_names`
 and yields successive values of `l.history_data.data(key)` for each key to a
@@ -335,12 +364,12 @@ purposes. The only reason you might not want to do that is that Ruby isn't the
 fastest language available, but then again, if you are dealing with such large
 MESA data sets that the computational timescales are getting too long for your
 comfort, you are in a pretty remarkable situation. As a practical note, if you
-use this in irb and you make an instance of `MESAData`, I'd recommend
-folllowing that up with a semi-colon and `nil` unless you want to see a ton of
+use this in irb and you make an instance of `MesaData`, I'd recommend
+following that up with a semi-colon and `nil` unless you want to see a ton of
 numbers fly up your screen. For instance, do this
 
-	l = MESALogDir.new; nil
-	
+	l = MesaLogDir.new; nil
+
 The `nil` keeps irb from outputting all the data held in `l`. Or consider using
 the wonderful irb replacement [Pry](http://pryrepl.org) which can make
 exploring your data outside of plots a much more pleasant experience (for
