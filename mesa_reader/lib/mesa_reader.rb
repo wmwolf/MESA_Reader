@@ -188,32 +188,32 @@ module MesaReader
   #
 
   class MesaProfileIndex
-    attr_reader :model_numbers, :profile_numbers
+    attr_reader :model_numbers, :profile_numbers, :priorities, 
+      :model_number_hash, :profile_number_hash
     def initialize(filename)
       @model_numbers = Dobjects::Dvector.new
       @priorities = Dobjects::Dvector.new
       @profile_numbers = Dobjects::Dvector.new
-      @data_array = [@model_numbers, @priorities, @profile_numbers]
-      Dobjects::Dvector.read(filename, @data_array, 2)
+      data_array = [model_numbers, priorities, profile_numbers]
+      Dobjects::Dvector.read(filename, data_array, 2)
       @model_number_hash = {}
-      @model_numbers.each_with_index do |num, i|
-        @model_number_hash[num.to_i] = @profile_numbers[i].to_i
+      model_numbers.each_with_index do |num, i|
+        @model_number_hash[num.to_i] = profile_numbers[i].to_i
       end
-      @profile_number_hash = @model_number_hash.invert
+      @profile_number_hash = model_number_hash.invert
       @profile_numbers.sort! do |num1, num2|
-        @profile_number_hash[num1.to_i] <=> @profile_number_hash[num2.to_i]
+        profile_number_hash[num1.to_i] <=> profile_number_hash[num2.to_i]
       end
       @model_numbers.sort!
-      return nil
     end
     def have_profile_with_model_number?(model_number)
-      @model_numbers.include?(model_number)
+      model_numbers.include?(model_number)
     end
     def have_profile_with_profile_number?(profile_number)
-      @profile_numbers.include?(profile_number)
+      profile_numbers.include?(profile_number)
     end
     def profile_with_model_number(model_number)
-      @model_number_hash[model_number]
+      model_number_hash[model_number]
     end
   end
 
@@ -327,7 +327,7 @@ module MesaReader
     
     def select_models(*keys)
       keys.each do |key|
-        raise "#{key} not a recognized data category." unless @h.data?(key)
+        raise "#{key} not a recognized data category." unless history.data? key
       end
       unless block_given?
         raise "Must provide a block for SELECT_MODELS to test values of" + 
