@@ -39,8 +39,8 @@ module MesaReader
     attr_reader :file_name, :header_names, :header_data, :bulk_names, 
       :bulk_data, :data_hash, :header_hash
     def initialize(filename, scrub = true, dbg = false)
-      # In this context, rows start at 1, not 0. These can and should be changed
-      # if MESA conventions change.
+      # In this context, rows start at 1, not 0. These can and should be 
+      # changed if MESA conventions change.
 
       header_names_row = 2
       header_data_row = header_names_row + 1
