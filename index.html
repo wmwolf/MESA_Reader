@@ -1,72 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
+    <meta charset="UTF-8">
     <title>Mesa Reader by wmwolf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>Mesa Reader</h1>
-        <h2>Tools for easily reading and accessing data created by MESA, particularly for use in plotting.</h2>
-        <a href="https://github.com/wmwolf/MESA_Reader" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+    <section class="page-header">
+      <h1 class="project-name">Mesa Reader</h1>
+      <h2 class="project-tagline">Tools for easily reading and accessing data created by MESA, particularly for use in plotting.</h2>
+      <a href="https://github.com/wmwolf/MESA_Reader" class="btn">View on GitHub</a>
+      <a href="https://github.com/wmwolf/MESA_Reader/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/wmwolf/MESA_Reader/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
-<a name="mesa_readerrb-the-easy-way-to-access-your-mesa-data" class="anchor" href="#mesa_readerrb-the-easy-way-to-access-your-mesa-data"><span class="octicon octicon-link"></span></a>MESA_Reader.rb: The easy way to access your MESA data</h1>
+    <section class="main-content">
+      <h1>
+<a id="mesareader-the-easy-way-to-access-your-mesa-data" class="anchor" href="#mesareader-the-easy-way-to-access-your-mesa-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>MesaReader: The easy way to access your MESA data</h1>
 
-<hr><h2>
-<a name="what-is-mesa_reader" class="anchor" href="#what-is-mesa_reader"><span class="octicon octicon-link"></span></a>What Is MESA_Reader?</h2>
+<hr>
 
-<p>This file gives you access to three classes: MESAData, MESAProfileIndex, and
-MESALogDir. The primary use is intended for plotting in
-<a href="http://www.kitp.ucsb.edu/members/PM/paxton/tioga.html">Tioga</a>, but as the
+<h2>
+<a id="what-is-mesareader" class="anchor" href="#what-is-mesareader" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Is MesaReader?</h2>
+
+<p>This file gives you access to a ruby module, MesaReader, containing three
+classes: MesaData, MesaProfileIndex, and MesaLogDir. The primary use is
+intended for plotting in
+<a href="http://www.kitp.ucsb.edu/members/PM/paxton/tioga.html">Tioga</a>, but as the 
 tools become more sophisticated, analysis can be done on the fly with irb or
 standalone scripts.</p>
 
 <h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <h3>
-<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
 
-<p>To install MESA_Reader, you must already have Tioga installed, since it makes
-extensive use of DVectors for bulk data storage and easy access for Tioga
-plots. Obivously you need an installation of Ruby. I haven't found any conflicts with Ruby 1.8.7, 1.9.3, or 2.0, and I'm told it now works with 1.8.6. </p>
+<p>Obivously you need an installation of Ruby. I haven't found any conflicts with Ruby 1.8.7, 1.9.3, or 2.0+, and I'm told it now works with 1.8.6. If you are doing a manual installation, you will also need to have tiogga, a plotting
+package, installed since MesaReader gathers data into Dvectors, which are a
+part of Tioga.</p>
 
 <h3>
-<a name="local-installation" class="anchor" href="#local-installation"><span class="octicon octicon-link"></span></a>Local Installation</h3>
+<a id="quick-installation" class="anchor" href="#quick-installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick Installation</h3>
 
-<p>Placing the file in your work directory may be sufficient if you just plan to
-use this for plotting purposes since it will copy over with the rest of the
-directory whenever you make a new work directory.</p>
+<p>As of this writing, MesaReader is now packaged as a gem. If you have RubyGems
+working (and you probably do), you should be able to install it via</p>
+
+<pre><code>gem install mesa_reader
+</code></pre>
+
+<p>You may need to have superuser privileges, so just prepend <code>sudo</code> to the
+previous command if rubygems barks at you about privileges. Tioga is a
+prerequisite since MesaReader loads data into Dvectors, but Tioga installation
+should occur automatically.</p>
+
+<h3>
+<a id="manual-installation" class="anchor" href="#manual-installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Manual Installation</h3>
+
+<p>If you can't use a RubyGems installation, you can manually place the 
+<code>mesa_reader.rb</code> file in useful location for installation. Copying it to
+your work directory may be sufficient if you just plan to use this for plotting
+purposes since it will copy over with the rest of the directory whenever you
+make a new work directory.</p>
 
 <p>Another possible installation idea that I've been using is to clone the git
-repository somewhere sensible on my machine and then create a pointer file in my
-Ruby path (see below). For instance, I have a file in <code>/usr/lib/ruby/</code> called 
-<code>MESA_Reader.rb</code> that has one line:</p>
+repository somewhere sensible on my machine and then create a pointer file in 
+my Ruby path (see below). For instance, I have a file in <code>/usr/lib/ruby/</code> 
+called <code>mesa_reader.rb</code> that has one line:</p>
 
-<pre><code>require '/Users/wmwolf/Documents/MESA_Reader/MESA_Reader.rb'
+<pre><code>require '/Users/wmwolf/Documents/MESA_Reader/mesa_reader/lib/mesa_reader.rb'
 </code></pre>
 
 <p>That way, the source file is easily accessible in my git repo while also being
-readable from Ruby's path. That is, when you tell ruby to require MESA_Reader,
+readable from Ruby's path. That is, when you tell ruby to require MesaReader,
 it will find the file in its path, which will then load the file from your
 local repo.</p>
 
@@ -76,23 +86,22 @@ it. You'll want to change the path to where you want to install the file, but
 the commands are</p>
 
 <pre><code>cd ~/Documents
-git clone https://github.com/wmwolf/MESA_Reader.git MESA_Reader
+git clone https://github.com/wmwolf/MESA_Reader.git MesaReader
 </code></pre>
 
-<p>which will install the contents of the repo (currently just the MESA_Reader.rb 
-file and this README) into a directory called MESA_Reader in your Documents
+<p>which will install the contents of the repo (currently a RubyGems-style directory for MesaReader and this README) into a directory called MesaReader in your Documents
 directory. Then any time you want to update to the latest release, you can do</p>
 
-<pre><code>cd ~/Documents/MESA_Reader
+<pre><code>cd ~/Documents/MesaReader
 git pull
 </code></pre>
 
 <p>Or, hopefully, you can make your own additions and push updates for me to add!</p>
 
 <h3>
-<a name="global-installation" class="anchor" href="#global-installation"><span class="octicon octicon-link"></span></a>Global Installation</h3>
+<a id="global-installation" class="anchor" href="#global-installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Global Installation</h3>
 
-<p>For a more permanent solution, put MESA_Reader.rb in your ruby path. For me
+<p>For a more permanent solution, put mesa_reader.rb in your ruby path. For me
 (on a mac), placing it in <code>/usr/lib/ruby/</code> did the trick. To see where you
 should install the file for global use enter the following line into your
 terminal</p>
@@ -105,47 +114,62 @@ update to a newer version of these tools, just move the new file to the same
 place.</p>
 
 <h2>
-<a name="making-the-classes-available" class="anchor" href="#making-the-classes-available"><span class="octicon octicon-link"></span></a>Making the Classes Available</h2>
+<a id="making-the-module-available" class="anchor" href="#making-the-module-available" aria-hidden="true"><span class="octicon octicon-link"></span></a>Making the Module Available</h2>
 
 <p>In your program (or irb), just start with</p>
 
-<pre><code>require 'MESA_Reader'
+<pre><code>require 'mesa_reader'
 </code></pre>
 
 <p>If the file is in the same directory as your current working one, it will be
 read from there. Otherwise, ruby will search through its available paths for a
-file called <code>MESA_Reader.rb</code> and load the first one it finds.</p>
+file called <code>mesa_reader.rb</code> and load the first one it finds. Note that in Ruby
+2.0+, the working directory is no longer on the search. You must either use
+<code>require_relative</code> or explicitly indicate that you want to search the current
+directory with <code>require './mesa_reader</code>. This will also work in earlier versions of ruby, so if you are requiring a local copy, you should get in this
+habit.</p>
+
+<p>If you want direct access to the classes, you will also need to put in the line</p>
+
+<pre><code>include MesaReader
+</code></pre>
+
+<p>This takes all of the contents of the module <code>MesaReader</code> and drops them into 
+your current namespace. If you don't do this, you'll just have to add 
+<code>MesaReader::</code> in front of any class name, like <code>MesaReader::MesaData</code> or 
+<code>MesaReader::MesaLogDir</code>. For subsequent examples, I'll assume you have
+included the entire module (i.e., no more typing out <code>MesaReader::</code>).</p>
 
 <h2>
-<a name="creating-instances" class="anchor" href="#creating-instances"><span class="octicon octicon-link"></span></a>Creating Instances</h2>
+<a id="creating-instances" class="anchor" href="#creating-instances" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating Instances</h2>
 
-<p>To create a simple <code>MESAData</code> instance, use the class <code>::initialize</code> method:</p>
+<p>To create a simple <code>MesaData</code> instance, use the class <code>#initialize</code> method:</p>
 
-<pre><code>s = MESAData.new(FILEPATH)
+<pre><code>s = MesaData.new(FILEPATH)
 </code></pre>
 
 <p>where <code>FILEPATH</code> is a string that is the path (relative or fully-qualified) to
 the file you wish to read in. For instance, if you are in the work directory
 and you want to read in the history file, you would use <code>'LOGS/history.data'</code>
 in place of <code>FILEPATH</code>. You can load history or profile files since the basic
-<code>MESAData</code> object doesn't know the difference (though when loading history
+<code>MesaData</code> object doesn't know the difference (though when loading history
 files, it does know to throw out backups, retries, and restarts, ensuring that
 the model numbers are monotonically increasing).</p>
 
-<p>To create a <code>MESAProfileIndex</code> instance, we'll use that class' <code>::initialize</code>
+<p>To create a <code>MesaProfileIndex</code> instance, we'll use that class' <code>#initialize</code>
 method as well.</p>
 
-<pre><code>m = MESAProfileIndex.new(FILEPATH)
+<pre><code>m = MesaProfileIndex.new(FILEPATH)
 </code></pre>
 
 <p>where now <code>FILEPATH</code> is a string containing the path to your profiles index
 file, like <code>'LOGS/profiles.index'</code>.</p>
 
-<p>Finally, to make a <code>MESALogDir</code> instance, we use that class' <code>::initialize</code>
+<p>Finally, to make a <code>MesaLogDir</code> instance, we use that class' <code>#initialize</code>
 method again. Unlike the first two examples, though, this class can take many
 more initialization parameters. To use just two of them, here's an example:</p>
 
-<pre><code>l = MESALogDir.new('log_path' =&gt; '~/mesa/star/work/LOGS', 'history_file' =&gt; 'history.data')
+<pre><code>l = MesaLogDir.new('log_path' =&gt; '~/mesa/star/work/LOGS', 'history_file' =&gt; 'history.data')
 </code></pre>
 
 <p>You can also set <code>'profile_prefix'</code>, <code>'profile_suffix'</code>, and <code>'index_file'</code>,
@@ -159,27 +183,27 @@ profile file, and the full name of the index file. The defaults are</p>
 'index_file'     =&gt; 'profiles.index
 </code></pre>
 
-<p>Normally these shouldn't need to be altered, and so long as you don't have custom-named log directories, <code>l = MESALogDir.new</code>, with no options, should suffice.</p>
+<p>Normally these shouldn't need to be altered, and so long as you don't have custom-named log directories, <code>l = MesaLogDir.new</code>, with no options, should suffice.</p>
 
 <h2>
-<a name="mesadata-methods" class="anchor" href="#mesadata-methods"><span class="octicon octicon-link"></span></a>MESAData Methods</h2>
+<a id="mesadata-methods" class="anchor" href="#mesadata-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>MesaData Methods</h2>
 
-<p>There are 11 publicly accessible instance methods for <code>MESAData</code> objects. Their
-usage is detailed below. For convenience, we'll assume that <code>s</code> is an instance
-of the <code>MESAData</code> class. That is, assume we have already done</p>
+<p>There are many publicly accessible instance methods for <code>MesaData</code> objects.
+Their usage is detailed below. For convenience, we'll assume that <code>s</code> is an
+instance of the <code>MesaData</code> class. That is, assume we have already done</p>
 
-<pre><code>s = MESAData.new('LOGS/history.data')
+<pre><code>s = MesaData.new('LOGS/history.data')
 </code></pre>
 
 <h3>
-<a name="bulk_data" class="anchor" href="#bulk_data"><span class="octicon octicon-link"></span></a><code>#bulk_data</code>
+<a id="bulk_data" class="anchor" href="#bulk_data" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#bulk_data</code>
 </h3>
 
 <p>Returns an array of Dvectors containing the columns from the source file. This
 isn't very useful and is really only a diagnostic tool.</p>
 
 <h3>
-<a name="bulk_names" class="anchor" href="#bulk_names"><span class="octicon octicon-link"></span></a><code>#bulk_names</code>
+<a id="bulk_names" class="anchor" href="#bulk_names" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#bulk_names</code>
 </h3>
 
 <p>Returns an array of strings that are the names of each of the data columns.
@@ -188,7 +212,7 @@ Together with <code>#bulk_data</code> forms a hash that is accessed using the <c
 command to convert data column names into Dvectors.</p>
 
 <h3>
-<a name="datakey" class="anchor" href="#datakey"><span class="octicon octicon-link"></span></a><code>#data(key)</code>
+<a id="datakey" class="anchor" href="#datakey" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#data(key)</code>
 </h3>
 
 <p>Accepts a string and returns the corresponding Dvector from <code>#bulk_data</code>. This
@@ -200,7 +224,7 @@ is the main usage of the class.</p>
 <p>Returns <code>nil</code> and prints a warning if no such key exists in <code>s.bulk_names</code>.</p>
 
 <h3>
-<a name="data_at_model_numberkey-model_number" class="anchor" href="#data_at_model_numberkey-model_number"><span class="octicon octicon-link"></span></a><code>#data_at_model_number(key, model_number)</code>
+<a id="data_at_model_numberkey-model_number" class="anchor" href="#data_at_model_numberkey-model_number" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#data_at_model_number(key, model_number)</code>
 </h3>
 
 <p>Accepts a string and a model number (float or integer) and returns the value of
@@ -210,21 +234,21 @@ thrown if <code>model_number</code> is not a data category or if the given model
 outside the range of <code>s.data('model_number')</code>.</p>
 
 <h3>
-<a name="datakey-1" class="anchor" href="#datakey-1"><span class="octicon octicon-link"></span></a><code>#data?(key)</code>
+<a id="datakey-1" class="anchor" href="#datakey-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#data?(key)</code>
 </h3>
 
 <p>Accepts a string and returns <code>true</code> if the entry is found in <code>s.bulk_names</code> and
 <code>false</code> otherwise.</p>
 
 <h3>
-<a name="filename" class="anchor" href="#filename"><span class="octicon octicon-link"></span></a><code>#filename</code>
+<a id="file_name" class="anchor" href="#file_name" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#file_name</code>
 </h3>
 
 <p>Returns a string containing the name of the file that was read into the
 instance.</p>
 
 <h3>
-<a name="headerkey" class="anchor" href="#headerkey"><span class="octicon octicon-link"></span></a><code>#header(key)</code>
+<a id="headerkey" class="anchor" href="#headerkey" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#header(key)</code>
 </h3>
 
 <p>Accepts a string and returns the corresponding value from <code>#header_data</code>. The
@@ -233,25 +257,25 @@ warning will be printed). Works in much the same way as <code>#data</code> but w
 header data rather than the bulk data.</p>
 
 <h3>
-<a name="headerkey-1" class="anchor" href="#headerkey-1"><span class="octicon octicon-link"></span></a><code>#header?(key)</code>
+<a id="headerkey-1" class="anchor" href="#headerkey-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#header?(key)</code>
 </h3>
 
 <p>Accepts a string and returns <code>true</code> if the string is in <code>s.header_names</code>.</p>
 
 <h3>
-<a name="header_data" class="anchor" href="#header_data"><span class="octicon octicon-link"></span></a><code>#header_data</code>
+<a id="header_data" class="anchor" href="#header_data" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#header_data</code>
 </h3>
 
 <p>Returns an array of all the data in the header row of the source file.</p>
 
 <h3>
-<a name="header_names" class="anchor" href="#header_names"><span class="octicon octicon-link"></span></a><code>#header_names</code>
+<a id="header_names" class="anchor" href="#header_names" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#header_names</code>
 </h3>
 
 <p>Returns an array of strings containing all the names of the header data entries.</p>
 
 <h3>
-<a name="wherekeys" class="anchor" href="#wherekeys"><span class="octicon octicon-link"></span></a><code>#where(keys)</code>
+<a id="wherekeys" class="anchor" href="#wherekeys" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#where(keys)</code>
 </h3>
 
 <p>Accepts an arbitrary (at least one) number of strings as arguments, each of
@@ -273,12 +297,12 @@ luminosity for times later than a million years via</p>
 </code></pre>
 
 <h3>
-<a name="magic-methods" class="anchor" href="#magic-methods"><span class="octicon octicon-link"></span></a>Magic Methods</h3>
+<a id="magic-methods" class="anchor" href="#magic-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Magic Methods</h3>
 
 <p>Depending on the type of file read in to the object (specifically what ends up
 in <code>s.bulk_names</code>), you can also access the bulk data through some shorthand
 without using the <code>#data</code> method. So long as the data name isn't already a 
-defined method on the <code>MESAData</code> class, you can simply use its name as a method
+defined method on the <code>MesaData</code> class, you can simply use its name as a method
 which just returns <code>data("#{name}")</code>. That is, if you load in a history file, </p>
 
 <pre><code>s.data('model_number')
@@ -306,114 +330,114 @@ categories via magic methods) a <code>NameError</code> will be thrown, just like
 any other case of a bad method call.</p>
 
 <h2>
-<a name="mesaprofileindex-methods" class="anchor" href="#mesaprofileindex-methods"><span class="octicon octicon-link"></span></a>MESAProfileIndex Methods</h2>
+<a id="mesaprofileindex-methods" class="anchor" href="#mesaprofileindex-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>MesaProfileIndex Methods</h2>
 
-<p>There are five publicly accessible methods for the <code>MESAProfileIndex</code> class,
+<p>There are five publicly accessible methods for the <code>MesaProfileIndex</code> class,
 though likely the only useful methods are <code>#have_profile_with_model_number?</code>
 and <code>#profile_with_model_number</code>, which allow you to obtain a model number from
 a model number. In practice, this class isn't very useful on its own, but is
-used extensively in the <code>MESALogDir</code> class.</p>
+used extensively in the <code>MesaLogDir</code> class.</p>
 
 <h3>
-<a name="have_profile_with_model_numbermodel_number" class="anchor" href="#have_profile_with_model_numbermodel_number"><span class="octicon octicon-link"></span></a><code>#have_profile_with_model_number?(model_number)</code>
+<a id="have_profile_with_model_numbermodel_number" class="anchor" href="#have_profile_with_model_numbermodel_number" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#have_profile_with_model_number?(model_number)</code>
 </h3>
 
 <p>Accepts an integer, a model number, and returns <code>true</code> if there is a profile
 available with that model number. Otherwise returns <code>false</code>.</p>
 
 <h3>
-<a name="have_profile_with_profile_numberprofile_number" class="anchor" href="#have_profile_with_profile_numberprofile_number"><span class="octicon octicon-link"></span></a><code>#have_profile_with_profile_number?(profile_number)</code>
+<a id="have_profile_with_profile_numberprofile_number" class="anchor" href="#have_profile_with_profile_numberprofile_number" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#have_profile_with_profile_number?(profile_number)</code>
 </h3>
 
 <p>Accepts an integer, a profile number, and returns <code>true</code> if there is a profile
 with that profile number. Otherwise returns <code>false</code>.</p>
 
 <h3>
-<a name="model_numbers" class="anchor" href="#model_numbers"><span class="octicon octicon-link"></span></a><code>#model_numbers</code>
+<a id="model_numbers" class="anchor" href="#model_numbers" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#model_numbers</code>
 </h3>
 
 <p>Returns a Dvector containing all the model numbers that have profiles available.</p>
 
 <h3>
-<a name="profile_numbers" class="anchor" href="#profile_numbers"><span class="octicon octicon-link"></span></a><code>#profile_numbers</code>
+<a id="profile_numbers" class="anchor" href="#profile_numbers" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#profile_numbers</code>
 </h3>
 
 <p>Returns a Dvector containing all the profile numbers available.</p>
 
 <h3>
-<a name="profile_with_model_numbermodel_number" class="anchor" href="#profile_with_model_numbermodel_number"><span class="octicon octicon-link"></span></a><code>#profile_with_model_number(model_number)</code>
+<a id="profile_with_model_numbermodel_number" class="anchor" href="#profile_with_model_numbermodel_number" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#profile_with_model_number(model_number)</code>
 </h3>
 
 <p>Accepts an integer model number and returns the profile number that corresponds
 to it. Returns <code>nil</code> if there is no such profile.</p>
 
 <h2>
-<a name="mesalogdir-methods" class="anchor" href="#mesalogdir-methods"><span class="octicon octicon-link"></span></a><code>MESALogDir Methods</code>
+<a id="mesalogdir-methods" class="anchor" href="#mesalogdir-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>MesaLogDir Methods</code>
 </h2>
 
 <p>We'll suppose we've already made an instance for the purpose of examples via</p>
 
-<pre><code>l = MESALogDir.new
+<pre><code>l = MesaLogDir.new
 </code></pre>
 
-<p>In addition to the methods defined below, all the methods of <code>MESAProfileIndex</code> 
-are available and are simply called on the internal <code>MESAProfileIndex</code> created
-within the <code>MESALogDir</code> structure.</p>
+<p>In addition to the methods defined below, all the methods of <code>MesaProfileIndex</code>
+are available and are simply called on the internal <code>MesaProfileIndex</code> created
+within the <code>MesaLogDir</code> structure.</p>
 
 <h3>
-<a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a><code>#contents</code>
+<a id="contents" class="anchor" href="#contents" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#contents</code>
 </h3>
 
 <p>Returns an array of strings containing names of all the files in the directory
 returned by <code>l.log_path</code>.</p>
 
 <h3>
-<a name="history_data" class="anchor" href="#history_data"><span class="octicon octicon-link"></span></a><code>#history_data</code>
+<a id="history_data" class="anchor" href="#history_data" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#history_data</code>
 </h3>
 
-<p>Returns a <code>MESAData</code> instance made from <code>l.history_file</code> in <code>l.log_path</code>. This 
-object is created at initialization and is thus "free". There's no need to catch
-this in a variable to spare the MESAData initialization process each time it is
-called.</p>
+<p>Returns a <code>MesaData</code> instance made from <code>l.history_file</code> in <code>l.log_path</code>. This
+object is created at initialization and is thus "free". There's no need to
+catch this in a variable to spare the MesaData initialization process each time
+it is called.</p>
 
 <h3>
-<a name="history" class="anchor" href="#history"><span class="octicon octicon-link"></span></a><code>#history</code>
+<a id="history" class="anchor" href="#history" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#history</code>
 </h3>
 
 <p>Alias for <code>history</code>.</p>
 
 <h3>
-<a name="history_file" class="anchor" href="#history_file"><span class="octicon octicon-link"></span></a><code>#history_file</code>
+<a id="history_file" class="anchor" href="#history_file" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#history_file</code>
 </h3>
 
 <p>Returns the name of the history data file in <code>l.log_path</code>.</p>
 
 <h3>
-<a name="index_file" class="anchor" href="#index_file"><span class="octicon octicon-link"></span></a><code>#index_file</code>
+<a id="index_file" class="anchor" href="#index_file" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#index_file</code>
 </h3>
 
 <p>Returns the name of the profile index file in <code>l.log_path</code>.</p>
 
 <h3>
-<a name="log_path" class="anchor" href="#log_path"><span class="octicon octicon-link"></span></a><code>#log_path</code>
+<a id="log_path" class="anchor" href="#log_path" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#log_path</code>
 </h3>
 
 <p>Returns a string containing the given path to the logs directory.</p>
 
 <h3>
-<a name="profiles" class="anchor" href="#profiles"><span class="octicon octicon-link"></span></a><code>#profiles</code>
+<a id="profiles" class="anchor" href="#profiles" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#profiles</code>
 </h3>
 
-<p>Returns a <code>MESAProfileIndex</code> instance built from <code>l.index_file</code></p>
+<p>Returns a <code>MesaProfileIndex</code> instance built from <code>l.index_file</code></p>
 
 <h3>
-<a name="profile_dataparams" class="anchor" href="#profile_dataparams"><span class="octicon octicon-link"></span></a><code>#profile_data(params)</code>
+<a id="profile_dataparams" class="anchor" href="#profile_dataparams" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#profile_data(params)</code>
 </h3>
 
 <p>Accepts two possible integer arguments, <code>'model_number'</code> or <code>'profile_number'</code>
 which specify a profile to be loaded. If neither are given, the profile with
 the largest model number (i.e., the last saved profile) is selected. Returns a
-<code>MESAData</code> object built from this profile. If the model number provided has no
+<code>MesaData</code> object built from this profile. If the model number provided has no
 profile (i.e. <code>l.profiles.profile_with_model_number(params['model_number']) =&gt;
 nil</code>), then the default model number is selected. If a profile number is used,
 it will attempt to use it no matter what, triggering an error if the given
@@ -422,14 +446,14 @@ profile number is invalid. For example</p>
 <pre><code>p = l.profile_data('model_number' =&gt; 300)
 </code></pre>
 
-<p>would set <code>p</code> to be a <code>MESAData</code> object built from the profile data associated
+<p>would set <code>p</code> to be a <code>MesaData</code> object built from the profile data associated
 with model number 300. If no such model number existed, though, it would pull
 data from the profile with the largest model number. If we instead used</p>
 
 <pre><code>p = l.profile_data('model_number' =&gt; 300, 'profile_number' =&gt; 15)
 </code></pre>
 
-<p>then <code>p</code> would be set to a <code>MESAData</code> object with profile number 15. The
+<p>then <code>p</code> would be set to a <code>MesaData</code> object with profile number 15. The
 <code>'model_number'</code> entry is entirely ignored. If there was no profile with
 profile number 15, an exception will be raised. Essentially there is never a
 time when it is helpful to specify both a model number and a profile number,
@@ -437,28 +461,28 @@ and again, if neither are specified, the profile with the largest model number
 is used.</p>
 
 <p>Each of these objects are made as this is called. That is, they aren't "sitting
-around" like the history MESAData object. As such, these should be captured in
+around" like the history MesaData object. As such, these should be captured in
 a variable so that they aren't re-constructed each time they are needed.</p>
 
 <h3>
-<a name="profile_prefix" class="anchor" href="#profile_prefix"><span class="octicon octicon-link"></span></a><code>#profile_prefix</code>
+<a id="profile_prefix" class="anchor" href="#profile_prefix" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#profile_prefix</code>
 </h3>
 
 <p>Returns the string containing the profile prefix as defined in the
-<code>MESAProfileIndex</code> class.</p>
+<code>MesaProfileIndex</code> class.</p>
 
 <h3>
-<a name="profile_suffix" class="anchor" href="#profile_suffix"><span class="octicon octicon-link"></span></a><code>#profile_suffix</code>
+<a id="profile_suffix" class="anchor" href="#profile_suffix" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#profile_suffix</code>
 </h3>
 
 <p>Returns the string containing the profile suffix as defined in the
-<code>MESAProfileIndex</code> class.</p>
+<code>MesaProfileIndex</code> class.</p>
 
 <h3>
-<a name="select_modelskeys" class="anchor" href="#select_modelskeys"><span class="octicon octicon-link"></span></a><code>#select_models(keys)</code>
+<a id="select_modelskeys" class="anchor" href="#select_modelskeys" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>#select_models(keys)</code>
 </h3>
 
-<p>Nearly identical to <code>#where</code> in the <code>MESAData</code> class, but ensures that the
+<p>Nearly identical to <code>#where</code> in the <code>MesaData</code> class, but ensures that the
 returned model numbers have corresponding profile files. Accepts an arbitrary
 number (at least one) of strings that must be in <code>l.history_data.bulk_names</code>
 and yields successive values of <code>l.history_data.data(key)</code> for each key to a
@@ -475,7 +499,7 @@ in <em>and</em> have central temperatures exceeding 1e8 <em>and</em> have centra
 exceeding 1e3.</p>
 
 <h2>
-<a name="some-additional-thoughts" class="anchor" href="#some-additional-thoughts"><span class="octicon octicon-link"></span></a>Some Additional Thoughts</h2>
+<a id="some-additional-thoughts" class="anchor" href="#some-additional-thoughts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Some Additional Thoughts</h2>
 
 <p>The uses for these classes are pretty generic. As stated earlier, they were
 developed primarily to ease plotting MESA data in Tioga, but they are also
@@ -484,11 +508,11 @@ purposes. The only reason you might not want to do that is that Ruby isn't the
 fastest language available, but then again, if you are dealing with such large
 MESA data sets that the computational timescales are getting too long for your
 comfort, you are in a pretty remarkable situation. As a practical note, if you
-use this in irb and you make an instance of <code>MESAData</code>, I'd recommend
-folllowing that up with a semi-colon and <code>nil</code> unless you want to see a ton of
+use this in irb and you make an instance of <code>MesaData</code>, I'd recommend
+following that up with a semi-colon and <code>nil</code> unless you want to see a ton of
 numbers fly up your screen. For instance, do this</p>
 
-<pre><code>l = MESALogDir.new; nil
+<pre><code>l = MesaLogDir.new; nil
 </code></pre>
 
 <p>The <code>nil</code> keeps irb from outputting all the data held in <code>l</code>. Or consider using
@@ -498,25 +522,16 @@ instance a simple semi-colon will suppress outputting the return value). If you
 have any problems with or suggestions for further development of these classes,
 please contact me or better yet, make some commits and push the changes for
 deployment!</p>
-        </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/wmwolf/MESA_Reader/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/wmwolf/MESA_Reader/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/wmwolf/MESA_Reader">Mesa Reader</a> is maintained by <a href="https://github.com/wmwolf">wmwolf</a>.</span>
 
-          <p class="repo-owner"><a href="https://github.com/wmwolf/MESA_Reader"></a> is maintained by <a href="https://github.com/wmwolf">wmwolf</a>.</p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
-    </div>
+    </section>
 
   
   </body>
 </html>
+
