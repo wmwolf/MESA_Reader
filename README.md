@@ -1,4 +1,4 @@
-#MesaReader: The easy way to access your MESA data
+# MesaReader: The easy way to access your MESA data
 ___
 
 ## What Is MesaReader?
